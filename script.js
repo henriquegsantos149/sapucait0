@@ -178,10 +178,14 @@ async function initMapData() {
         // Ajustar Zoom
         map.fitBounds(featureGroup.getBounds(), { padding: [50, 50] });
 
-        // Atualizar Controle de Camadas
-        // Removemos o anterior e criamos um novo com os dados carregados
-        // Usamos HTML nas chaves para criar a legenda
-        map.removeControl(layerControl);
+        // 4. Planta Baixa (ImageOverlay) - Definir ANTES de usar no window.layers
+        // Limites calculados a partir do arquivo .pgw e dimensões da imagem (1938x2113)
+        const camaroteBounds = [[-22.9111280659, -43.1973117666], [-22.9109347872, -43.1971344953]];
+        const camaroteOverlay = L.imageOverlay('data/Sapucai_Exemplo_Planta_Camarote_03_small.png', camaroteBounds, {
+            opacity: 1,
+            interactive: true,
+            zIndex: 1
+        });
 
         // Store layers globally for zoom function
         window.layers = {
@@ -191,6 +195,9 @@ async function initMapData() {
             'planta': camaroteOverlay,
             'osm': osmLayer
         };
+
+        // Atualizar Controle de Camadas
+        map.removeControl(layerControl);
 
         // Helper to create label with zoom button
         const createLabel = (text, layerId) => {
@@ -210,7 +217,8 @@ async function initMapData() {
             {
                 [labelUber]: uberLayer,
                 [labelMetro]: metroLayer,
-                [labelCamarote]: camaroteLayer
+                [labelCamarote]: camaroteLayer,
+                [labelPlanta]: camaroteOverlay
             },
             { collapsed: false } // Sempre aberto
         ).addTo(map);
@@ -234,22 +242,6 @@ async function initMapData() {
                 header.querySelector('button').innerHTML = '▲';
             }
         };
-
-        // 4. Planta Baixa (ImageOverlay)
-        // Limites calculados a partir do arquivo .pgw e dimensões da imagem (1938x2113)
-        // South-West: [-22.911128, -43.197312]
-        // North-East: [-22.910935, -43.197134]
-        const camaroteBounds = [[-22.9111280659, -43.1973117666], [-22.9109347872, -43.1971344953]];
-
-        // NOTA: Usando imagem otimizada (_small.png) para melhor performance
-        const camaroteOverlay = L.imageOverlay('data/Sapucai_Exemplo_Planta_Camarote_03_small.png', camaroteBounds, {
-            opacity: 1,
-            interactive: true,
-            zIndex: 1
-        }); // REMOVIDO .addTo(map) para não carregar de início se não precisar
-
-        // Adicionar ao controle de camadas (mas sem adicionar ao mapa ainda)
-        layerControl.addOverlay(camaroteOverlay, labelPlanta);
 
         // 5. Controle de Visibilidade por Zoom
         // Regra: < 22 mostra GeoJSON, >= 22 mostra PNG

@@ -10,12 +10,30 @@ L.control.zoom({
     position: 'bottomright'
 }).addTo(map);
 
+// --- Global Zoom to Layer Function ---
+window.zoomToLayer = function (layerId) {
+    if (layerId === 'osm') {
+        map.setView([-22.91216, -43.1966], 15);
+        return;
+    }
+
+    // Acessar camadas globais (definidas em initMapData)
+    if (window.layers && window.layers[layerId]) {
+        const layer = window.layers[layerId];
+        if (layer.getBounds) {
+            map.fitBounds(layer.getBounds(), { padding: [50, 50] });
+        } else if (layer.getLatLng) {
+            map.setView(layer.getLatLng(), 18);
+        }
+    }
+};
+
 // --- Custom Control: Locate Me ---
 L.Control.Locate = L.Control.extend({
     onAdd: function (map) {
-        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-locate');
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-locate-pill');
         const button = L.DomUtil.create('a', '', container);
-        button.innerHTML = '📍'; // Emoji ou ícone (pode usar FontAwesome se quiser)
+        button.innerHTML = '<span>📍 Ativar minha localização</span>';
         button.href = '#';
         button.title = "Onde estou?";
         button.role = "button";
@@ -165,10 +183,27 @@ async function initMapData() {
         // Usamos HTML nas chaves para criar a legenda
         map.removeControl(layerControl);
 
-        const labelUber = '<span style="color:black; font-weight:bold; font-size:18px;">&#9473;&#9473;</span> Rota Uber';
-        const labelMetro = '<span style="color:#FF4500; font-weight:bold; font-size:18px;">&#9473;&#9473;</span> Rota Metrô';
-        const labelCamarote = '<span style="display:inline-block; width:12px; height:12px; background:purple; opacity:0.5; border:1px solid purple; margin-right:5px;"></span> Camarote VIP';
-        const labelPlanta = '<span style="font-size:16px;">🗺️</span> Planta Baixa';
+        // Store layers globally for zoom function
+        window.layers = {
+            'uber': uberLayer,
+            'metro': metroLayer,
+            'camarote': camaroteLayer,
+            'planta': camaroteOverlay,
+            'osm': osmLayer
+        };
+
+        // Helper to create label with zoom button
+        const createLabel = (text, layerId) => {
+            return `<div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                        <span>${text}</span>
+                        <button class="zoom-to-layer-btn" onclick="zoomToLayer('${layerId}')" title="Zoom na camada">🔍</button>
+                    </div>`;
+        };
+
+        const labelUber = createLabel('<span style="color:black; font-weight:bold; font-size:18px;">&#9473;&#9473;</span> Rota Uber', 'uber');
+        const labelMetro = createLabel('<span style="color:#FF4500; font-weight:bold; font-size:18px;">&#9473;&#9473;</span> Rota Metrô', 'metro');
+        const labelCamarote = createLabel('<span style="display:inline-block; width:12px; height:12px; background:purple; opacity:0.5; border:1px solid purple; margin-right:5px;"></span> Camarote VIP', 'camarote');
+        const labelPlanta = createLabel('<span style="font-size:16px;">🗺️</span> Planta Baixa', 'planta');
 
         layerControl = L.control.layers(
             { "🌍 Mapa Base": osmLayer },
@@ -179,6 +214,26 @@ async function initMapData() {
             },
             { collapsed: false } // Sempre aberto
         ).addTo(map);
+
+        // Add Header with Minimize Button
+        const container = layerControl.getContainer();
+        const header = L.DomUtil.create('div', 'layer-control-header', container);
+        header.innerHTML = '<span>Camadas</span> <button>▼</button>';
+        container.insertBefore(header, container.firstChild);
+
+        // Prevent map click propagation
+        L.DomEvent.disableClickPropagation(container);
+
+        header.onclick = function (e) {
+            L.DomEvent.stop(e);
+            if (container.classList.contains('minimized')) {
+                container.classList.remove('minimized');
+                header.querySelector('button').innerHTML = '▼';
+            } else {
+                container.classList.add('minimized');
+                header.querySelector('button').innerHTML = '▲';
+            }
+        };
 
         // 4. Planta Baixa (ImageOverlay)
         // Limites calculados a partir do arquivo .pgw e dimensões da imagem (1938x2113)

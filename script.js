@@ -62,31 +62,6 @@ function onLocationError(e) {
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
 
-// --- Custom Control: Legend ---
-const legend = L.control({ position: 'bottomleft' });
-
-legend.onAdd = function (map) {
-    const div = L.DomUtil.create('div', 'info legend');
-    const grades = ["Rota Uber", "Rota Metrô", "Camarote"];
-    const colors = ["black", "#FF4500", "purple"];
-    const types = ["line", "line", "poly"]; // line or poly
-
-    // Título (opcional)
-    // div.innerHTML += '<strong>Legenda</strong><br>';
-
-    // Loop para gerar os itens da legenda
-    // Uber
-    div.innerHTML += '<i style="background: black; height: 4px; margin-top: 8px;"></i> Rota Uber<br>';
-    // Metrô
-    div.innerHTML += '<i style="background: #FF4500; height: 4px; margin-top: 8px;"></i> Rota Metrô<br>';
-    // Camarote
-    div.innerHTML += '<i style="background: purple; opacity: 0.5;"></i> Camarote VIP<br>';
-
-    return div;
-};
-
-legend.addTo(map);
-
 // 1. Mapa Base (OpenStreetMap)
 const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 25, // Permite ir até o nível 22
@@ -131,10 +106,11 @@ async function loadGeoJSON(url, styleOptions, popupText, layerName) {
 
 // Controle de Camadas (Layer Control)
 // Inicialmente vazio, será populado dinamicamente ou recriado
+// Agora com collapsed: false para ficar sempre aberto
 let layerControl = L.control.layers(
     { "Mapa Base": osmLayer },
     overlays,
-    { collapsed: false } // Deixar aberto ou fechado por padrão
+    { collapsed: false }
 ).addTo(map);
 
 // Adicionar Escala no canto inferior direito
@@ -186,15 +162,22 @@ async function initMapData() {
 
         // Atualizar Controle de Camadas
         // Removemos o anterior e criamos um novo com os dados carregados
+        // Usamos HTML nas chaves para criar a legenda
         map.removeControl(layerControl);
+
+        const labelUber = '<span style="color:black; font-weight:bold; font-size:18px;">&#9473;&#9473;</span> Rota Uber';
+        const labelMetro = '<span style="color:#FF4500; font-weight:bold; font-size:18px;">&#9473;&#9473;</span> Rota Metrô';
+        const labelCamarote = '<span style="display:inline-block; width:12px; height:12px; background:purple; opacity:0.5; border:1px solid purple; margin-right:5px;"></span> Camarote VIP';
+        const labelPlanta = '<span style="font-size:16px;">🗺️</span> Planta Baixa';
+
         layerControl = L.control.layers(
-            { "Mapa Base": osmLayer },
+            { "🌍 Mapa Base": osmLayer },
             {
-                "Rota Uber": uberLayer,
-                "Rota Metrô": metroLayer,
-                "Camarote": camaroteLayer
+                [labelUber]: uberLayer,
+                [labelMetro]: metroLayer,
+                [labelCamarote]: camaroteLayer
             },
-            { collapsed: true }
+            { collapsed: false } // Sempre aberto
         ).addTo(map);
 
         // 4. Planta Baixa (ImageOverlay)
@@ -211,7 +194,7 @@ async function initMapData() {
         }); // REMOVIDO .addTo(map) para não carregar de início se não precisar
 
         // Adicionar ao controle de camadas (mas sem adicionar ao mapa ainda)
-        layerControl.addOverlay(camaroteOverlay, "Planta Baixa");
+        layerControl.addOverlay(camaroteOverlay, labelPlanta);
 
         // 5. Controle de Visibilidade por Zoom
         // Regra: < 22 mostra GeoJSON, >= 22 mostra PNG

@@ -28,32 +28,12 @@ window.zoomToLayer = function (layerId) {
     }
 };
 
-// --- Custom Control: Locate Me ---
-L.Control.Locate = L.Control.extend({
-    onAdd: function (map) {
-        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-locate-pill');
-        const button = L.DomUtil.create('a', '', container);
-        button.innerHTML = '<span>📍 Ativar minha localização</span>';
-        button.href = '#';
-        button.title = "Onde estou?";
-        button.role = "button";
-
-        L.DomEvent.on(button, 'click', function (e) {
-            L.DomEvent.stop(e);
-            // Inicia o rastreamento com alta precisão
-            map.locate({ setView: true, maxZoom: 18, watch: true, enableHighAccuracy: true });
-        });
-
-        return container;
-    },
-    onRemove: function (map) { }
+// --- Custom Locate Button Logic ---
+document.getElementById('locate-btn').addEventListener('click', function (e) {
+    e.preventDefault();
+    // Inicia o rastreamento com alta precisão
+    map.locate({ setView: true, maxZoom: 18, watch: true, enableHighAccuracy: true });
 });
-
-L.control.locate = function (opts) {
-    return new L.Control.Locate(opts);
-}
-
-L.control.locate({ position: 'bottomright' }).addTo(map);
 
 // --- Geolocation Logic ---
 let userMarker, userCircle;

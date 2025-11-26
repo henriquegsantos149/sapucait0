@@ -22,10 +22,23 @@ html {
 
 /* --- Custom UI Styles --- */
 
+/* --- Liquid Glass Effect (Shared Style) --- */
+.leaflet-control-layers,
+.custom-locate-btn,
+.leaflet-bar a {
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+    color: #333 !important;
+}
+
 /* Leaflet Controls Re-styling for Mobile (FAB style) */
 .leaflet-touch .leaflet-bar {
     border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: none;
+    /* Shadow handled by glass effect */
 }
 
 .leaflet-touch .leaflet-bar a {
@@ -35,21 +48,36 @@ html {
     border-radius: 50%;
     /* Circular FAB */
     margin-bottom: 10px;
-    background-color: white;
-    color: #333;
     font-size: 18px;
     font-weight: bold;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .leaflet-touch .leaflet-bar a:hover {
-    background-color: #f5f5f5;
+    background: rgba(255, 255, 255, 0.4) !important;
     transform: scale(1.05);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
 }
 
+/* Layer Control Styling - Unified Legend */
+.leaflet-control-layers {
+    border-radius: 24px;
+    /* More rounded */
+    font-family: 'Roboto', sans-serif;
+    padding: 0;
+
+    /* Centralizar no topo */
+    position: fixed !important;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0 !important;
+    z-index: 1000;
+    min-width: 260px;
+}
 
 /* Estilo do container expandido (que agora é o padrão) */
 .leaflet-control-layers-expanded {
@@ -93,19 +121,21 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     cursor: pointer;
     font-weight: bold;
-    font-size: 14px;
-    color: #333;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 16px 16px 0 0;
+    font-size: 15px;
+    color: #222;
+    background: rgba(255, 255, 255, 0.1);
+    /* Slight tint */
+    border-radius: 24px 24px 0 0;
 }
 
 .leaflet-control-layers.minimized .layer-control-header {
     border-bottom: none;
-    border-radius: 16px;
+    border-radius: 24px;
+    /* Fully rounded when minimized */
 }
 
 .layer-control-header button {
@@ -159,20 +189,15 @@ html {
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
-    /* Above Leaflet controls */
 
-    background-color: white;
-    color: #333;
-    border: none;
     border-radius: 50px;
     /* Pill shape */
-    padding: 12px 24px;
+    padding: 12px 28px;
 
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
@@ -187,13 +212,8 @@ html {
 
 .custom-locate-btn:hover {
     transform: translateX(-50%) translateY(-2px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
-    background-color: #f8f9fa;
-}
-
-.custom-locate-btn:active {
-    transform: translateX(-50%) scale(0.95);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 10px 40px 0 rgba(31, 38, 135, 0.25) !important;
 }
 
 .custom-locate-btn .icon {

@@ -164,8 +164,11 @@ async function initMapData() {
             zIndex: 1
         });
 
-        // Ajustar Zoom Inicial para a Planta Baixa
-        map.fitBounds(camaroteBounds, { padding: [20, 20] });
+        // Ajustar Zoom Inicial para a Planta Baixa (Zoom 23)
+        // Centro calculado de camaroteBounds:
+        // Lat: (-22.9111280659 + -22.9109347872) / 2 = -22.91103142655
+        // Lng: (-43.1973117666 + -43.1971344953) / 2 = -43.19722313095
+        map.setView([-22.91103142655, -43.19722313095], 23);
 
         // Store layers globally for zoom function
         window.layers = {

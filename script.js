@@ -155,9 +155,6 @@ async function initMapData() {
         featureGroup.addLayer(metroLayer);
         featureGroup.addLayer(camaroteLayer);
 
-        // Ajustar Zoom
-        map.fitBounds(featureGroup.getBounds(), { padding: [50, 50] });
-
         // 4. Planta Baixa (ImageOverlay) - Definir ANTES de usar no window.layers
         // Limites calculados a partir do arquivo .pgw e dimensões da imagem (1938x2113)
         const camaroteBounds = [[-22.9111280659, -43.1973117666], [-22.9109347872, -43.1971344953]];
@@ -166,6 +163,9 @@ async function initMapData() {
             interactive: true,
             zIndex: 1
         });
+
+        // Ajustar Zoom Inicial para a Planta Baixa
+        map.fitBounds(camaroteBounds, { padding: [20, 20] });
 
         // Store layers globally for zoom function
         window.layers = {
@@ -206,8 +206,11 @@ async function initMapData() {
         // Add Header with Minimize Button
         const container = layerControl.getContainer();
         const header = L.DomUtil.create('div', 'layer-control-header', container);
-        header.innerHTML = '<span>Camadas</span> <button>▼</button>';
+        header.innerHTML = '<span>Rotas</span> <button>▼</button>';
         container.insertBefore(header, container.firstChild);
+
+        // Começar minimizado
+        container.classList.add('minimized');
 
         // Prevent map click propagation
         L.DomEvent.disableClickPropagation(container);
@@ -216,10 +219,10 @@ async function initMapData() {
             L.DomEvent.stop(e);
             if (container.classList.contains('minimized')) {
                 container.classList.remove('minimized');
-                header.querySelector('button').innerHTML = '▼';
+                header.querySelector('button').innerHTML = '▲';
             } else {
                 container.classList.add('minimized');
-                header.querySelector('button').innerHTML = '▲';
+                header.querySelector('button').innerHTML = '▼';
             }
         };
 

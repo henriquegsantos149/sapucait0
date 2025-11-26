@@ -50,29 +50,6 @@ html {
     transform: scale(1.05);
 }
 
-.leaflet-touch .leaflet-control-zoom-in,
-.leaflet-touch .leaflet-control-zoom-out {
-    border-radius: 50% !important;
-    /* Força arredondamento */
-}
-
-/* Layer Control Styling - Unified Legend */
-.leaflet-control-layers {
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    font-family: 'Roboto', sans-serif;
-    padding: 0;
-    /* Padding controlado internamente */
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    /* Glassmorphism */
-}
-
-/* Esconder o botão de toggle padrão pois vamos deixar sempre aberto */
-.leaflet-control-layers-toggle {
-    display: none;
-}
 
 /* Estilo do container expandido (que agora é o padrão) */
 .leaflet-control-layers-expanded {
